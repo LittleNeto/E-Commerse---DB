@@ -1,6 +1,6 @@
 # Dicionário de Dados - Sistema de E-commerce
 
-Este documento apresenta o Dicionário de Dados do projeto de Banco de Dados, estruturado a partir do Modelo Entidade-Relacionamento (MER) fornecido. A padronização e os tipos de dados seguem estritamente as diretrizes e convenções estabelecidas no modelo de referência.
+Este documento contém o dicionário de dados referente ao projeto da disciplina Banco de Dados, ministrada pelo professor Fábio Luiz Leite Júnior no período de 2026.1
 
 ---
 
