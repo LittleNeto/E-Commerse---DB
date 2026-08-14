@@ -33,7 +33,18 @@ Este documento contém o dicionário de dados referente ao projeto da disciplina
 | `data_cadastro` | DATETIME | — | Não | Não | Não | Não | CURRENT_TIMESTAMP | Data e hora de criação da conta | Preenchida automaticamente no cadastro. |
 | `status_conta` | CHAR | 1 | Não | Não | Não | Não | 'A' | Situação atual da conta | 'A' = Ativo, 'I' = Inativo, 'B' = Bloqueado. |
 | `foto_perfil` | VARCHAR | 255 | Não | Não | Sim | Não | — | URL ou caminho da foto de perfil | String apontando para o storage de imagens. |
-| `preferencias_compra` | TEXT | — | Não | Não | Sim | Não | — | Interesses e tags de preferência | Estrutura de texto ou formato JSON. |
+
+---
+
+### Tabela: preferencia_cliente
+
+**Descrição:** Armazena as preferências associadas a cada cliente da plataforma.
+
+| Campo | Tipo de Dado | Tamanho | PK | FK | Nulo | Único | Default | Descrição | Regra de Negócio / Domínio |
+|---|---|---|---|---|---|---|---|---|---|
+| `id_preferencia` |	INTEGER |	— |	Sim |	Não |	Não |	Sim |	Auto Increment |	Identificador único da preferência |	Gerado automaticamente pelo sistema. |
+| `id_cliente` |	INTEGER |	— |	Não |	Sim |	Não |	Não |	— |	Identificador do cliente associado |	Deve corresponder a um cliente existente na tabela cliente. |
+| `preferencia` |	VARCHAR |	100 |	Não |	Não |	Não |	Não |	— |	Preferência do cliente |	Campo obrigatório. |
 
 ---
 
@@ -125,7 +136,7 @@ Este documento contém o dicionário de dados referente ao projeto da disciplina
 | Campo | Tipo de Dado | Tamanho | PK | FK | Nulo | Único | Default | Descrição | Regra de Negócio / Domínio |
 |---|---|---|---|---|---|---|---|---|---|
 | `id_carrinho` | INTEGER | — | Sim | Não | Não | Sim | Auto Increment | Identificador único do carrinho | Gerado automaticamente. |
-| `id_cliente` | INTEGER | — | Não | Sim | Não | Sim | — | Cliente proprietário do carrinho | Relação 1:1 ativa por cliente. |
+| `id_cliente` | INTEGER | — | Não | Sim | Não | Não | — | Cliente proprietário do carrinho | Permite múltiplos carrinhos por cliente. |
 | `data_criacao` | DATETIME | — | Não | Não | Não | Não | CURRENT_TIMESTAMP | Momento em que o carrinho foi aberto | Preenchido automaticamente. |
 | `ultima_atualizacao`| DATETIME| — | Não | Não | Não | Não | CURRENT_TIMESTAMP | Última alteração de itens | Atualizado via triggers. |
 | `situacao_carrinho`| VARCHAR | 20 | Não | Não | Não | Não | 'Aberto' | Estado atual do carrinho | 'Aberto', 'Convertido', 'Abandonado'. |
@@ -134,14 +145,14 @@ Este documento contém o dicionário de dados referente ao projeto da disciplina
 
 ---
 
-### Tabela: `item_carrinho`
+### Tabela: `Carrinho_Armazena_Item`
 **Descrição:** Tabela associativa que discrimina os produtos adicionados a um carrinho de compras. Conforme o modelo lógico estruturado, vincula-se diretamente a `produto`.
 
 | Campo | Tipo de Dado | Tamanho | PK | FK | Nulo | Único | Default | Descrição | Regra de Negócio / Domínio |
 |---|---|---|---|---|---|---|---|---|---|
 | `id_item_carrinho`| INTEGER | — | Sim | Não | Não | Sim | Auto Increment | Identificador único da linha | Gerado automaticamente. |
 | `id_carrinho` | INTEGER | — | Não | Sim | Não | Não | — | FK identificando o carrinho de origem | Deve existir em `carrinho_de_compras`. |
-| `id_produto` | INTEGER | — | Não | Sim | Não | Não | — | FK identificando o produto associado | Deve existir na tabela `produto`. |
+| `id_item` | INTEGER | — | Não | Sim | Não | Não | — | FK identificando o item associado | Deve existir na tabela `item`. |
 | `quantidade_item` | INTEGER | — | Não | Não | Não | Não | 1 | Unidades selecionadas | Deve ser maior que 0. |
 | `preco_item` | DECIMAL | 15,2 | Não | Não | Não | Não | — | Preço unitário no momento da inserção| Histórico de preço de inserção. |
 | `desconto` | DECIMAL | 15,2 | Não | Não | Não | Não | 0.00 | Abatimento aplicado a este item | Valor nominal de desconto. |
@@ -174,8 +185,8 @@ Este documento contém o dicionário de dados referente ao projeto da disciplina
 | Campo | Tipo de Dado | Tamanho | PK | FK | Nulo | Único | Default | Descrição | Regra de Negócio / Domínio |
 |---|---|---|---|---|---|---|---|---|---|
 | `id_item_pedido` | INTEGER | — | Sim | Não | Não | Sim | Auto Increment | Chave primária da linha do item | Identificador do registro físico. |
-| `id_pedido` | INTEGER | — | Não | Sim | Não | Não | — | FK do pedido consolidado | Deve pertencer a um registro em `pedido`. |
-| `id_item` | INTEGER | — | Não | Sim | Não | Não | — | FK do item variante específico | Mantém vínculo histórico com `item`. |
+| `id_pedido` | INTEGER | — | Não | Sim | Não | Sim | — | FK do pedido consolidado | Deve pertencer a um registro em `pedido`. |
+| `id_item` | INTEGER | — | Não | Sim | Não | Sim | — | FK do item variante específico | Mantém vínculo histórico com `item`. |
 | `quantidade` | INTEGER | — | Não | Não | Não | Não | — | Quantidade efetivamente comprada | Valor estritamente maior que zero. |
 | `preco_unitario` | DECIMAL | 15,2 | Não | Não | Não | Não | — | Preço de tabela unitário do item | Valor cheio do item sem os descontos da linha. |
 | `subtotal` | DECIMAL | 15,2 | Não | Não | Não | Não | — | Valor final faturado desta linha | `(preco_unitario - desconto) * quantidade`. |
@@ -248,8 +259,8 @@ Este documento contém o dicionário de dados referente ao projeto da disciplina
 | Campo | Tipo de Dado | Tamanho | PK | FK | Nulo | Único | Default | Descrição | Regra de Negócio / Domínio |
 |---|---|---|---|---|---|---|---|---|---|
 | `id_avaliacao` | INTEGER | — | Sim | Não | Não | Sim | Auto Increment | Identificador único do comentário | Gerado automaticamente. |
-| `id_cliente` | INTEGER | — | Não | Sim | Não | Não | — | FK do cliente autor do feedback | Deve constar em `cliente`. |
-| `id_produto` | INTEGER | — | Não | Sim | Não | Não | — | FK do produto macro avaliado | Deve constar em `produto`. |
+| `id_cliente` | INTEGER | — | Não | Sim | Não | Sim | — | FK do cliente autor do feedback | Deve constar em `cliente`. |
+| `id_produto` | INTEGER | — | Não | Sim | Não | Sim | — | FK do produto macro avaliado | Deve constar em `produto`. |
 | `nota` | INTEGER | — | Não | Não | Não | Não | — | Pontuação dada ao produto | Valores válidos inteiros de 1 a 5. |
 | `comentario` | TEXT | — | Não | Não | Sim | Não | — | Texto livre com a opinião do cliente | Crítica ou elogio por extenso. |
 | `data_avaliacao` | DATETIME | — | Não | Não | Não | Não | CURRENT_TIMESTAMP | Dia e hora da postagem | Definido na criação do registro. |
