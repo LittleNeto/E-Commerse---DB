@@ -36,7 +36,7 @@ Este documento contém o dicionário de dados referente ao projeto da disciplina
 
 ---
 
-### Tabela: preferencia_cliente
+### Tabela: `preferencia_cliente`
 
 **Descrição:** Armazena as preferências associadas a cada cliente da plataforma.
 
