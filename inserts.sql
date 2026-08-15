@@ -42,9 +42,9 @@ values
 insert into `produto`
     (`id_produto`, `id_categoria`, `nome_produto`, `marca`, `fabricante`, `peso`, `descricao_curta`, `descricao_longa`, `dimensoes`, `cadastro`, `status_produto`, `avaliacao_media`, `numero_visualizacoes`, `garantia`)
 values
-    (1, 4, 'Smartphone Galaxy S23', 'Samsung', 'Samsung Electronics', 0.168, 'Smartphone com tela AMOLED de 6.1"', 'Smartphone Samsung Galaxy S23 com processador Snapdragon 8 Gen 2, câmera tripla de 50MP e tela Dynamic AMOLED 2X.', '14.6x7.1x0.76 cm', '2025-01-15 10:00:00', 'A', 4.50, 320, '12 meses pelo fabricante'),
+    (1, 4, 'Smartphone Galaxy S23', 'Samsung', 'Samsung Electronics', 0.168, 'Smartphone com tela AMOLED de 6.1"', 'Smartphone Samsung Galaxy S23 com processador Snapdragon 8 Gen 2, câmera tripla de 50MP e tela Dynamic AMOLED 2X.', '14.6x7.1x0.76 cm', '2025-01-15 10:00:00', 'A', 5.00, 320, '12 meses pelo fabricante'),
     (2, 4, 'iPhone 15', 'Apple', 'Apple Inc.', 0.171, 'iPhone com chip A16 Bionic', 'iPhone 15 com tela Super Retina XDR de 6.1", câmera dupla de 48MP e conector USB-C.', '14.7x7.1x0.78 cm', '2025-01-20 10:30:00', 'A', 0.00, 410, '12 meses pelo fabricante'),
-    (3, 5, 'Notebook Inspiron 15', 'Dell', 'Dell Technologies', 1.650, 'Notebook para uso profissional', 'Notebook Dell Inspiron 15 com processador Intel Core i7, 16GB RAM e SSD 512GB.', '35.8x23.5x1.9 cm', '2025-02-05 09:20:00', 'A', 4.00, 158, '12 meses pelo fabricante'),
+    (3, 5, 'Notebook Inspiron 15', 'Dell', 'Dell Technologies', 1.650, 'Notebook para uso profissional', 'Notebook Dell Inspiron 15 com processador Intel Core i7, 16GB RAM e SSD 512GB.', '35.8x23.5x1.9 cm', '2025-02-05 09:20:00', 'A', 0.00, 158, '12 meses pelo fabricante'),
     (4, 6, 'Camisa Polo Clássica', 'Lacoste', 'Lacoste S.A.', 0.220, 'Camisa polo de algodão piquet', 'Camisa polo masculina em algodão piquet, corte regular, disponível em várias cores.', '30x25x2 cm', '2025-02-18 15:45:00', 'A', 0.00, 76, '3 meses'),
     (5, 3, 'Sofá 3 Lugares Comfort', 'Tok&Stok', 'Tok&Stok Indústria e Comércio', 45.000, 'Sofá confortável para sala de estar', 'Sofá de 3 lugares com estrutura em madeira maciça, espuma D33 e revestimento em suede.', '210x90x85 cm', '2025-03-01 08:10:00', 'A', 0.00, 42, '6 meses');
 
