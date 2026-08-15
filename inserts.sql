@@ -1,13 +1,3 @@
--- =========================================================================
--- Script de Inserção de Dados - Sistema de E-commerce
--- Dados fictícios para fins de teste/demonstração do modelo relacional.
--- Ordem de inserção respeita as dependências de chave estrangeira definidas
--- em tabelas.sql.
--- =========================================================================
-
--- -------------------------------------------------------------------------
--- cliente
--- -------------------------------------------------------------------------
 insert into `cliente`
     (`id_cliente`, `nome_cliente`, `cpf`, `data_nascimento`, `sexo`, `telefone`, `email`, `senha`, `data_cadastro`, `status_conta`, `foto_perfil`)
 values
@@ -17,9 +7,6 @@ values
     (4, 'Ana Beatriz Lima', '45678901234', '2000-11-09', 'F', '83966664444', 'ana.lima@email.com', '$2y$10$hashfake0000000000000000000000000000000000000000004', '2025-04-22 11:25:00', 'A', 'perfil/ana_lima.jpg'),
     (5, 'Pedro Henrique Alves', '56789012345', '1993-03-17', 'O', '83955553333', 'pedro.alves@email.com', '$2y$10$hashfake0000000000000000000000000000000000000000005', '2025-05-07 20:50:00', 'B', null);
 
--- -------------------------------------------------------------------------
--- preferencia_cliente
--- -------------------------------------------------------------------------
 insert into `preferencia_cliente`
     (`id_preferencia`, `id_cliente`, `preferencia`)
 values
@@ -30,9 +17,6 @@ values
     (5, 4, 'Decoração'),
     (6, 4, 'Promoções');
 
--- -------------------------------------------------------------------------
--- endereco
--- -------------------------------------------------------------------------
 insert into `endereco`
     (`id_endereco`, `id_cliente`, `tipo`, `logradouro`, `numero`, `complemento`, `bairro`, `cidade`, `estado`, `cep`, `pais`, `ponto_ref`, `endereco_principal`)
 values
@@ -45,9 +29,6 @@ values
     (7, 4, 'Cobranca', 'Avenida Rio Branco', '1500', 'Bloco B, Apto 12', 'Catolé', 'Campina Grande', 'PB', '58410000', 'Brasil', null, false),
     (8, 5, 'Residencial', 'Rua Vigário Calixto', '33', 'S/N', 'Centro', 'Campina Grande', 'PB', '58400010', 'Brasil', null, true);
 
--- -------------------------------------------------------------------------
--- categoria
--- -------------------------------------------------------------------------
 insert into `categoria`
     (`id_categoria`, `nome_categoria`, `descricao`, `categoria_pai`, `status_categoria`, `imagem_representativa`)
 values
@@ -58,9 +39,6 @@ values
     (5, 'Notebooks', 'Computadores portáteis.', 1, 'A', 'categorias/notebooks.png'),
     (6, 'Roupas Masculinas', 'Vestuário masculino.', 2, 'A', 'categorias/roupas_masculinas.png');
 
--- -------------------------------------------------------------------------
--- produto
--- -------------------------------------------------------------------------
 insert into `produto`
     (`id_produto`, `id_categoria`, `nome_produto`, `marca`, `fabricante`, `peso`, `descricao_curta`, `descricao_longa`, `dimensoes`, `cadastro`, `status_produto`, `avaliacao_media`, `numero_visualizacoes`, `garantia`)
 values
@@ -70,9 +48,6 @@ values
     (4, 6, 'Camisa Polo Clássica', 'Lacoste', 'Lacoste S.A.', 0.220, 'Camisa polo de algodão piquet', 'Camisa polo masculina em algodão piquet, corte regular, disponível em várias cores.', '30x25x2 cm', '2025-02-18 15:45:00', 'A', 0.00, 76, '3 meses'),
     (5, 3, 'Sofá 3 Lugares Comfort', 'Tok&Stok', 'Tok&Stok Indústria e Comércio', 45.000, 'Sofá confortável para sala de estar', 'Sofá de 3 lugares com estrutura em madeira maciça, espuma D33 e revestimento em suede.', '210x90x85 cm', '2025-03-01 08:10:00', 'A', 0.00, 42, '6 meses');
 
--- -------------------------------------------------------------------------
--- item
--- -------------------------------------------------------------------------
 insert into `item`
     (`id_item`, `id_produto`, `sku`, `nome_item`, `marca`, `cor`, `tamanho`, `descricao`, `modelo`, `codigo_barra`, `preco`, `desconto`, `quantidade_restante`, `estoque_minimo`, `peso`, `imagem`, `status_item`)
 values
@@ -84,9 +59,6 @@ values
     (6, 4, 'CPL-BRC-G', 'Camisa Polo - Branca - G', 'Lacoste', 'Branco', 'G', 'Camisa polo tamanho G na cor branca.', 'PH4012', '7891234500066', 259.90, 0.00, 3, 10, 0.220, 'itens/polo_branca_g.jpg', 'A'),
     (7, 5, 'SOF3L-CZA', 'Sofá 3 Lugares - Cinza', 'Tok&Stok', 'Cinza', 'Único', 'Sofá revestido em suede cinza.', 'CF-3L-2024', '7891234500073', 2500.00, 0.00, 6, 2, 45.000, 'itens/sofa_cinza.jpg', 'A');
 
--- -------------------------------------------------------------------------
--- carrinho_de_compras
--- -------------------------------------------------------------------------
 insert into `carrinho_de_compras`
     (`id_carrinho`, `id_cliente`, `data_criacao`, `ultima_atualizacao`, `situacao_carrinho`, `valor_total`, `quantidade_itens`)
 values
@@ -95,9 +67,6 @@ values
     (3, 3, '2025-06-10 09:30:00', '2025-06-10 09:45:00', 'Aberto', 5700.00, 2),
     (4, 4, '2025-06-12 20:00:00', '2025-06-12 20:05:00', 'Abandonado', 259.90, 1);
 
--- -------------------------------------------------------------------------
--- carrinho_armazena_item
--- -------------------------------------------------------------------------
 insert into `carrinho_armazena_item`
     (`id_item_carrinho`, `id_carrinho`, `id_item`, `quantidade_item`, `preco_item`, `desconto`, `subtotal`, `data_adicao`)
 values
@@ -108,18 +77,12 @@ values
     (5, 3, 7, 1, 2500.00, 1699.00, 801.00, '2025-06-10 09:44:00'),
     (6, 4, 6, 1, 259.90, 0.00, 259.90, '2025-06-12 20:04:00');
 
--- -------------------------------------------------------------------------
--- pedido
--- -------------------------------------------------------------------------
 insert into `pedido`
     (`id_pedido`, `id_cliente`, `id_carrinho`, `id_endereco_entrega`, `id_endereco_cobranca`, `data_pedido`, `status_pedido`, `valor_total`, `valor_frete`, `valor_final`, `desconto_aplicado`, `prazo_estimado`, `motivo_cancelamento`)
 values
     (1, 1, 1, 1, 2, '2025-06-01 10:25:00', 'Entregue', 6398.80, 25.00, 6423.80, 0.00, '5 dias úteis', null),
     (2, 2, 2, 3, 4, '2025-06-05 16:15:00', 'Enviado', 7299.00, 0.00, 7199.00, 100.00, '3 dias úteis', null);
 
--- -------------------------------------------------------------------------
--- item_pedido
--- -------------------------------------------------------------------------
 insert into `item_pedido`
     (`id_item_pedido`, `id_pedido`, `id_item`, `quantidade`, `preco_unitario`, `subtotal`, `desconto`)
 values
@@ -127,54 +90,36 @@ values
     (2, 1, 5, 2, 199.90, 399.80, 0.00),
     (3, 2, 3, 1, 7499.00, 7299.00, 200.00);
 
--- -------------------------------------------------------------------------
--- observacoes_cliente
--- -------------------------------------------------------------------------
 insert into `observacoes_cliente`
     (`id_observacao`, `id_pedido`, `observacao_cliente`)
 values
     (1, 1, 'Deixar na portaria com o porteiro, caso não haja ninguém para receber.'),
     (2, 2, 'Entregar preferencialmente após às 18h, durante a semana.');
 
--- -------------------------------------------------------------------------
--- pagamento
--- -------------------------------------------------------------------------
 insert into `pagamento`
     (`id_pagamento`, `id_pedido`, `forma_pagamento`, `valor`, `data_pagamento`, `status`, `num_transacoes`, `quantidade_parcelas`, `bandeira_cartao`, `comprovante`)
 values
     (1, 1, 'Cartao_Credito', 6423.80, '2025-06-01 10:26:30', 'Aprovado', 1, 3, 'Visa', 'NSU-000123456'),
     (2, 2, 'Pix', 7199.00, '2025-06-05 16:16:05', 'Aprovado', 1, 1, null, 'PIX-TX-987654321');
 
--- -------------------------------------------------------------------------
--- observacoes_financeiras
--- -------------------------------------------------------------------------
 insert into `observacoes_financeiras`
     (`id_observacao_financeira`, `id_pagamento`, `observacao`)
 values
     (1, 1, 'Pagamento aprovado sem divergências na primeira tentativa.'),
     (2, 2, 'Confirmação recebida via webhook do PSP em poucos segundos.');
 
--- -------------------------------------------------------------------------
--- entrega
--- -------------------------------------------------------------------------
 insert into `entrega`
     (`id_entrega`, `id_pedido`, `transportadora`, `cod_rastreio`, `data_envio`, `data_prevista`, `data_entrega`, `status_entrega`, `entregador`, `custo_frete`, `historico`)
 values
     (1, 1, 'Correios', 'BR123456789PB', '2025-06-02 08:00:00', '2025-06-06 18:00:00', '2025-06-05 14:30:00', 'Entregue', 'José Ribeiro', 25.00, 'Objeto postado; Em trânsito; Saiu para entrega; Entregue ao destinatário.'),
     (2, 2, 'Loggi', 'LG987654321BR', '2025-06-06 09:00:00', '2025-06-09 18:00:00', null, 'Em Transito', null, 0.00, 'Objeto coletado; Em rota para centro de distribuição.');
 
--- -------------------------------------------------------------------------
--- avaliacao
--- -------------------------------------------------------------------------
 insert into `avaliacao`
     (`id_avaliacao`, `id_cliente`, `id_produto`, `nota`, `comentario`, `data_avaliacao`, `status_avaliacao`)
 values
     (1, 1, 1, 5, 'Excelente smartphone, câmera muito boa e bateria dura o dia todo.', '2025-06-07 12:00:00', 'Aprovado'),
     (2, 2, 3, 4, 'Notebook rápido, mas esquenta um pouco sob carga pesada.', '2025-06-11 09:30:00', 'Pendente');
 
--- -------------------------------------------------------------------------
--- registro_interacao
--- -------------------------------------------------------------------------
 insert into `registro_interacao`
     (`id_interacao`, `id_cliente`, `id_produto`, `data_visualizacao`, `horario_visualizacao`, `tempo_interacao`, `adicionado_favorito`, `adicionado_carrinho`, `quantidade_visualizacoes`, `dispositivo_utilizado`)
 values
@@ -184,18 +129,12 @@ values
     (4, 3, 7, '2025-06-10', '09:30:00', 300, true, true, 4, 'Desktop_Firefox'),
     (5, null, 2, '2025-06-13', '11:15:00', 60, false, false, 1, 'Mobile_Web_Android');
 
--- -------------------------------------------------------------------------
--- historico_cliente
--- -------------------------------------------------------------------------
 insert into `historico_cliente`
     (`id_compra`, `id_cliente`, `id_pedido`, `id_pagamento`, `id_entrega`)
 values
     (1, 1, 1, 1, 1),
     (2, 2, 2, 2, 2);
 
--- -------------------------------------------------------------------------
--- historico_pedido
--- -------------------------------------------------------------------------
 insert into `historico_pedido`
     (`id_historico`, `id_pedido`, `data`, `status_anterior`, `status_novo`, `responsavel`)
 values
@@ -205,9 +144,6 @@ values
     (4, 2, '2025-06-05 16:15:00', 'Processando', 'Pago', 'Sistema'),
     (5, 2, '2025-06-06 09:00:00', 'Pago', 'Enviado', 'Sistema');
 
--- -------------------------------------------------------------------------
--- movimentacao_estoque
--- -------------------------------------------------------------------------
 insert into `movimentacao_estoque`
     (`id_movimentacao`, `id_item`, `tipo_movimentacao`, `quantidade`, `data`, `responsavel`, `observacoes`)
 values
