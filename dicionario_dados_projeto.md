@@ -112,7 +112,7 @@ Este documento contém o dicionário de dados referente ao projeto da disciplina
 |---|---|---|---|---|---|---|---|---|---|
 | `id_item` | INTEGER | — | Sim | Não | Não | Sim | Auto Increment | Identificador único do item específico | Gerado automaticamente. |
 | `id_produto` | INTEGER | — | Não | Sim | Não | Não | — | FK relacionando o item ao seu produto pai | Deve existir na tabela `produto`. |
-| `sku` | VARCHAR | 50 | Não | Não | Não | Sim | — | Stock Keeping Unit (Código de estoque) | Código identificador logístico único. |
+| `sku` | VARCHAR | 50 | Sim | Não | Não | Sim | — | Stock Keeping Unit (Código de estoque) | Código identificador logístico único. |
 | `nome_item` | VARCHAR | 150 | Não | Não | Não | Não | — | Nome específico da variante do item | Ex: 'Smartphone X - Preto - 128GB'. |
 | `marca` | VARCHAR | 50 | Não | Não | Sim | Não | — | Marca específica da variante | Se nulo, assume a marca do produto pai. |
 | `cor` | VARCHAR | 30 | Não | Não | Sim | Não | — | Cor específica da variação | Ex: 'Preto', 'Azul'. |
@@ -168,7 +168,9 @@ Este documento contém o dicionário de dados referente ao projeto da disciplina
 |---|---|---|---|---|---|---|---|---|---|
 | `id_pedido` | INTEGER | — | Sim | Não | Não | Sim | Auto Increment | Identificador único numérico do pedido | Número oficial da compra. |
 | `id_cliente` | INTEGER | — | Não | Sim | Não | Não | — | FK do cliente comprador | Referencia a tabela `cliente`. |
+| `id_carrinho` | INTEGER | — | Não | Sim | Não | Não | — | FK do carrinho que originou o pedido | Referencia a tabela `carrinho_de_compras`. |
 | `id_endereco_entrega`| INTEGER | — | Não | Sim | Não | Não | — | Endereço para envio físico | Referencia a tabela `endereco`. |
+| `id_endereco_cobranca`| INTEGER | — | Não | Sim | Não | Não | — | Endereço de faturamento/cobrança | Referencia a tabela `endereco`. Pode coincidir com o de entrega. |
 | `data_pedido` | DATETIME | — | Não | Não | Não | Não | CURRENT_TIMESTAMP | Data e hora em que a compra fechou | Registrado na finalização. |
 | `status_pedido` | VARCHAR | 30 | Não | Não | Não | Não | 'Processando'| Situação da jornada do pedido | 'Processando', 'Pago', 'Enviado', 'Entregue', 'Cancelado'. |
 | `valor_total` | DECIMAL | 15,2 | Não | Não | Não | Não | — | Valor bruto original sem deduções | Soma original de todos os itens. |
@@ -176,6 +178,7 @@ Este documento contém o dicionário de dados referente ao projeto da disciplina
 | `valor_final` | DECIMAL | 15,2 | Não | Não | Não | Não | — | Valor líquido real faturado ao cliente| Cálculo final: `valor_total + valor_frete - desconto_aplicado`. |
 | `desconto_aplicado`| DECIMAL | 15,2 | Não | Não | Não | Não | 0.00 | Total de descontos consolidados | Cupons + abatimentos promocionais globais. |
 | `prazo_estimado` | VARCHAR | 50 | Não | Não | Sim | Não | — | Prazo prometido de entrega | Ex: '5 dias úteis'. |
+| `motivo_cancelamento`| VARCHAR | 255 | Não | Não | Sim | Não | — | Justificativa quando o pedido é cancelado | Preenchido apenas quando `status_pedido` = 'Cancelado'. |
 
 ---
 
@@ -299,6 +302,35 @@ Este documento contém o dicionário de dados referente ao projeto da disciplina
 
 ---
 
+### Tabela: `historico_pedido`
+**Descrição:** Trilha de auditoria que registra as mudanças de status de um pedido ao longo do seu ciclo de vida.
+
+| Campo | Tipo de Dado | Tamanho | PK | FK | Nulo | Único | Default | Descrição | Regra de Negócio / Domínio |
+|---|---|---|---|---|---|---|---|---|---|
+| `id_historico` | INTEGER | — | Sim | Não | Não | Sim | Auto Increment | Identificador único do registro de auditoria | Gerado automaticamente. |
+| `id_pedido` | INTEGER | — | Não | Sim | Não | Não | — | FK do pedido cujo status foi alterado | Deve existir na tabela `pedido`. |
+| `data` | DATETIME | — | Não | Não | Não | Não | CURRENT_TIMESTAMP | Momento da alteração de status | Preenchido automaticamente pelo sistema/trigger. |
+| `status_anterior` | VARCHAR | 30 | Não | Não | Não | Não | — | Status do pedido antes da alteração | Um dos valores de `pedido.status_pedido`. |
+| `status_novo` | VARCHAR | 30 | Não | Não | Não | Não | — | Status do pedido após a alteração | Um dos valores de `pedido.status_pedido`. |
+| `responsavel` | VARCHAR | 100 | Não | Não | Sim | Não | — | Autor da alteração de status | Usuário do sistema, processo automático ou 'Sistema'. |
+
+---
+
+### Tabela: `movimentacao_estoque`
+**Descrição:** Registra entradas, saídas, ajustes, devoluções, perdas e demais movimentações do estoque de cada item.
+
+| Campo | Tipo de Dado | Tamanho | PK | FK | Nulo | Único | Default | Descrição | Regra de Negócio / Domínio |
+|---|---|---|---|---|---|---|---|---|---|
+| `id_movimentacao` | INTEGER | — | Sim | Não | Não | Sim | Auto Increment | Identificador único da movimentação | Gerado automaticamente. |
+| `id_item` | INTEGER | — | Não | Sim | Não | Não | — | FK do item afetado pela movimentação | Deve existir na tabela `item`. |
+| `tipo_movimentacao` | VARCHAR | 30 | Não | Não | Não | Não | — | Natureza da movimentação de estoque | 'Entrada', 'Saida', 'Ajuste', 'Devolucao', 'Perda', 'Inventario'. |
+| `quantidade` | INTEGER | — | Não | Não | Não | Não | — | Quantidade de unidades movimentadas | Valor absoluto; o sinal é determinado por `tipo_movimentacao`. |
+| `data` | DATETIME | — | Não | Não | Não | Não | CURRENT_TIMESTAMP | Momento em que a movimentação ocorreu | Preenchido automaticamente. |
+| `responsavel` | VARCHAR | 100 | Não | Não | Sim | Não | — | Autor ou processo que gerou a movimentação | Usuário do sistema ou 'Sistema' (automático). |
+| `observacoes` | TEXT | — | Não | Não | Sim | Não | — | Detalhes adicionais sobre a movimentação | Texto livre, ex: motivo do ajuste. |
+
+---
+
 ## 3. Matriz de Relacionamentos
 
 Mapeamento lógico estruturado de acordo com as restrições e dependências do modelo relacional:
@@ -310,10 +342,12 @@ Mapeamento lógico estruturado de acordo com as restrições e dependências do 
 | `produto` | `id_categoria` | `categoria` | `id_categoria` | N:1 | Um produto pertence a uma categoria macro obrigatória. |
 | `item` | `id_produto` | `produto` | `id_produto` | N:1 | Um produto macro pode conter várias variações físicas (SKUs). |
 | `carrinho_de_compras`| `id_cliente` | `cliente` | `id_cliente` | 1:1 | Cada cliente possui um único carrinho ativo por vez. |
-| `item_carrinho` | `id_carrinho` | `carrinho_de_compras`| `id_carrinho` | N:1 | Um carrinho agrupa diversas linhas de itens. |
-| `item_carrinho` | `id_produto` | `produto` | `id_produto` | N:1 | Um item adicionado ao carrinho referencia conceitualmente um produto pai. |
+| `Carrinho_Armazena_Item` | `id_carrinho` | `carrinho_de_compras`| `id_carrinho` | N:1 | Um carrinho agrupa diversas linhas de itens. |
+| `Carrinho_Armazena_Item` | `id_item` | `item` | `id_item` | N:1 | Um item adicionado ao carrinho referencia a variação exata (SKU). |
 | `pedido` | `id_cliente` | `cliente` | `id_cliente` | N:1 | Um cliente realiza múltiplos pedidos ao longo do tempo. |
+| `pedido` | `id_carrinho` | `carrinho_de_compras`| `id_carrinho` | 1:1 | Um pedido é gerado a partir da confirmação de um carrinho específico. |
 | `pedido` | `id_endereco_entrega`| `endereco` | `id_endereco` | N:1 | Um pedido é despachado para um endereço específico cadastrado. |
+| `pedido` | `id_endereco_cobranca`| `endereco` | `id_endereco` | N:1 | Um pedido é faturado para um endereço específico cadastrado. |
 | `item_pedido` | `id_pedido` | `pedido` | `id_pedido` | N:1 | Um pedido fechado contém um ou mais itens discriminados. |
 | `item_pedido` | `id_item` | `item` | `id_item` | N:1 | A linha física do pedido aponta para a variação exata do item vendido. |
 | `observacoes_cliente`| `id_pedido` | `pedido` | `id_pedido` | N:1 | Um pedido pode ter observações ou instruções textuais anexadas. |
@@ -328,6 +362,8 @@ Mapeamento lógico estruturado de acordo com as restrições e dependências do 
 | `historico_cliente` | `id_pedido` | `pedido` | `id_pedido` | N:1 | Vincula o pedido concluído ao histórico consolidado do usuário. |
 | `historico_cliente` | `id_pagamento` | `pagamento` | `id_pagamento` | N:1 | Associa a transação financeira aprovada ao histórico do cliente. |
 | `historico_cliente` | `id_entrega` | `entrega` | `id_entrega` | N:1 | Associa o fluxo de despacho finalizado à linha do tempo do usuário. |
+| `historico_pedido` | `id_pedido` | `pedido` | `id_pedido` | N:1 | Um pedido pode acumular vários registros de mudança de status. |
+| `movimentacao_estoque`| `id_item` | `item` | `id_item` | N:1 | Um item pode ter várias movimentações de estoque ao longo do tempo. |
 
 ---
 
@@ -352,3 +388,4 @@ Mapeamento lógico estruturado de acordo com as restrições e dependências do 
 | `entrega.status_entrega` | Domínio Fixo | 'Pendente', 'Em Transito', 'Entregue', 'Extraviado' |
 | `avaliacao.nota` | Intervalo Fixo | Número inteiro contido e verificado entre `1` e `5` |
 | `avaliacao.status_avaliacao`| Domínio Fixo | 'Pendente', 'Aprovado', 'Reprovado' |
+| `movimentacao_estoque.tipo_movimentacao`| Domínio Fixo | 'Entrada', 'Saida', 'Ajuste', 'Devolucao', 'Perda', 'Inventario' |
