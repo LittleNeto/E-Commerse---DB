@@ -1,2 +1,2 @@
 # E-Commerse---DB
-Teste de dicionário de dados para modelagem do e-commerce
+Projeto feito para a disciplina de Banco de Dados, ministrada pelo professor Fábio Luiz Leite Júnior no período de 2026.1.
