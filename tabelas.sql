@@ -10,9 +10,16 @@ create table `cliente` (
     `data_cadastro` datetime not null default current_timestamp,
     `status_conta` char(1) not null default 'A',
     `foto_perfil` varchar(255),
-    `preferencias_compra` text,
     primary key(`id_cliente`),
     constraint `chk_cliente_status_conta` check (`status_conta` in ('A', 'I', 'B'))
+);
+
+create table `preferencia_cliente` (
+    `id_preferencia` integer not null auto_increment,
+    `id_cliente` integer not null,
+    `preferencia` varchar(100) not null,
+    primary key(`id_preferencia`),
+    constraint `fk_preferencia_cliente_cliente` foreign key (`id_cliente`) references `cliente` (`id_cliente`)
 );
 
 create table `endereco` (
@@ -93,7 +100,7 @@ create table `item` (
 
 create table `carrinho_de_compras` (
     `id_carrinho` integer not null auto_increment,
-    `id_cliente` integer not null unique,
+    `id_cliente` integer not null,
     `data_criacao` datetime not null default current_timestamp,
     `ultima_atualizacao` datetime not null default current_timestamp,
     `situacao_carrinho` varchar(20) not null default 'Aberto',
@@ -103,25 +110,27 @@ create table `carrinho_de_compras` (
     constraint `fk_carrinho_cliente` foreign key (`id_cliente`) references `cliente` (`id_cliente`)
 );
 
-create table `item_carrinho` (
+create table `carrinho_armazena_item` (
     `id_item_carrinho` integer not null auto_increment,
     `id_carrinho` integer not null,
-    `id_produto` integer not null,
+    `id_item` integer not null,
     `quantidade_item` integer not null default 1,
     `preco_item` decimal(15,2) not null,
     `desconto` decimal(15,2) not null default 0.00,
     `subtotal` decimal(15,2) not null,
     `data_adicao` datetime not null default current_timestamp,
     primary key(`id_item_carrinho`),
-    constraint `fk_item_carrinho_carrinho` foreign key (`id_carrinho`) references `carrinho_de_compras` (`id_carrinho`),
-    constraint `fk_item_carrinho_produto` foreign key (`id_produto`) references `produto` (`id_produto`),
-    constraint `chk_item_carrinho_quantidade` check (`quantidade_item` > 0)
+    constraint `fk_carrinho_armazena_item_carrinho` foreign key (`id_carrinho`) references `carrinho_de_compras` (`id_carrinho`),
+    constraint `fk_carrinho_armazena_item_item` foreign key (`id_item`) references `item` (`id_item`),
+    constraint `chk_carrinho_armazena_item_quantidade` check (`quantidade_item` > 0)
 );
 
 create table `pedido` (
     `id_pedido` integer not null auto_increment,
     `id_cliente` integer not null,
+    `id_carrinho` integer not null,
     `id_endereco_entrega` integer not null,
+    `id_endereco_cobranca` integer not null,
     `data_pedido` datetime not null default current_timestamp,
     `status_pedido` varchar(30) not null default 'Processando',
     `valor_total` decimal(15,2) not null,
@@ -129,9 +138,12 @@ create table `pedido` (
     `valor_final` decimal(15,2) not null,
     `desconto_aplicado` decimal(15,2) not null default 0.00,
     `prazo_estimado` varchar(50),
+    `motivo_cancelamento` varchar(255),
     primary key(`id_pedido`),
     constraint `fk_pedido_cliente` foreign key (`id_cliente`) references `cliente` (`id_cliente`),
-    constraint `fk_pedido_endereco` foreign key (`id_endereco_entrega`) references `endereco` (`id_endereco`),
+    constraint `fk_pedido_carrinho` foreign key (`id_carrinho`) references `carrinho_de_compras` (`id_carrinho`),
+    constraint `fk_pedido_endereco_entrega` foreign key (`id_endereco_entrega`) references `endereco` (`id_endereco`),
+    constraint `fk_pedido_endereco_cobranca` foreign key (`id_endereco_cobranca`) references `endereco` (`id_endereco`),
     constraint `chk_pedido_status` check (`status_pedido` in ('Processando', 'Pago', 'Enviado', 'Entregue', 'Cancelado')),
     constraint `chk_pedido_valor_final` check (`valor_final` = (`valor_total` + `valor_frete`) - `desconto_aplicado`)
 );
@@ -147,6 +159,7 @@ create table `item_pedido` (
     primary key(`id_item_pedido`),
     constraint `fk_item_pedido_pedido` foreign key (`id_pedido`) references `pedido` (`id_pedido`),
     constraint `fk_item_pedido_item` foreign key (`id_item`) references `item` (`id_item`),
+    constraint `uq_item_pedido_pedido_item` unique (`id_pedido`, `id_item`),
     constraint `chk_item_pedido_quantidade` check (`quantidade` > 0)
 );
 
@@ -212,6 +225,7 @@ create table `avaliacao` (
     primary key(`id_avaliacao`),
     constraint `fk_avaliacao_cliente` foreign key (`id_cliente`) references `cliente` (`id_cliente`),
     constraint `fk_avaliacao_produto` foreign key (`id_produto`) references `produto` (`id_produto`),
+    constraint `uq_avaliacao_cliente_produto` unique (`id_cliente`, `id_produto`),
     constraint `chk_avaliacao_nota` check (`nota` between 1 and 5),
     constraint `chk_avaliacao_status` check (`status_avaliacao` in ('Pendente', 'Aprovado', 'Reprovado'))
 );
@@ -243,4 +257,28 @@ create table `historico_cliente` (
     constraint `fk_historico_cliente_pedido` foreign key (`id_pedido`) references `pedido` (`id_pedido`),
     constraint `fk_historico_cliente_pagamento` foreign key (`id_pagamento`) references `pagamento` (`id_pagamento`),
     constraint `fk_historico_cliente_entrega` foreign key (`id_entrega`) references `entrega` (`id_entrega`)
+);
+
+create table `historico_pedido` (
+    `id_historico` integer not null auto_increment,
+    `id_pedido` integer not null,
+    `data` datetime not null default current_timestamp,
+    `status_anterior` varchar(30) not null,
+    `status_novo` varchar(30) not null,
+    `responsavel` varchar(100),
+    primary key(`id_historico`),
+    constraint `fk_historico_pedido_pedido` foreign key (`id_pedido`) references `pedido` (`id_pedido`)
+);
+
+create table `movimentacao_estoque` (
+    `id_movimentacao` integer not null auto_increment,
+    `id_item` integer not null,
+    `tipo_movimentacao` varchar(30) not null,
+    `quantidade` integer not null,
+    `data` datetime not null default current_timestamp,
+    `responsavel` varchar(100),
+    `observacoes` text,
+    primary key(`id_movimentacao`),
+    constraint `fk_movimentacao_estoque_item` foreign key (`id_item`) references `item` (`id_item`),
+    constraint `chk_movimentacao_estoque_tipo` check (`tipo_movimentacao` in ('Entrada', 'Saida', 'Ajuste', 'Devolucao', 'Perda', 'Inventario'))
 );
